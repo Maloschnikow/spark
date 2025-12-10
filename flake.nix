@@ -21,14 +21,42 @@
         pkgs = import nixpkgs {
           inherit system overlays;
         };
+
+        shellScripts = import ./nix/scripts.nix { inherit pkgs; };
+
+        go-migrate-pg = pkgs.go-migrate.overrideAttrs(oldAttrs: {
+          tags = ["postgres"];
+        });
       in {
         devShells.default = pkgs.mkShell {
           packages = with pkgs;
             [
               rust-bin.stable.latest.default
-            ];
+              cargo-audit
+              cargo-edit
+
+              postgresql_18
+              sqlx-cli # For migrations
+
+              act # To run github workflows locally
+            ]
+            ++ shellScripts;
 
           RUST_SRC_PATH = "${pkgs.rust.packages.stable.rustPlatform.rustLibSrc}";
+          shellHook = ''
+            export REPO_ROOT=$(git rev-parse --show-toplevel)
+            export PG_DIR=$REPO_ROOT/postgres
+            export PG_DATA_DIR=$PG_DIR/.pgdata
+            export PG_SOCKET_DIR=$PG_DIR/.pgsock
+
+            # Customizable
+            export CUSTOM_PGUSER=pguser
+            export PGDATABASE=db
+            export PGPASSWORD=password
+
+            # Used by sqlx
+            export DATABASE_URL="postgres:///$PGDATABASE?user=$CUSTOM_PGUSER&password=$PGPASSWORD&host=$PG_SOCKET_DIR"
+          '';
         };
       }
     );

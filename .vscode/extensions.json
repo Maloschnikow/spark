@@ -1,0 +1,7 @@
+{
+    "recommendations": [
+        "rust-lang.rust-analyzer",
+        "mtxr.sqltools",
+        "mtxr.sqltools-driver-pg",
+    ]
+}

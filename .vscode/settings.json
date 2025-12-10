@@ -1,0 +1,18 @@
+{
+    "rust-analyzer.rustc.source": "backend",
+    "files.exclude": {
+        ".direnv": true,
+        "backend/target": true
+    },
+    "sqltools.connections": [
+        {
+            "ssh": "Disabled",
+            "previewLimit": 50,
+            "driver": "PostgreSQL",
+            "name": "db",
+            "socketPath": "postgres/.pgsock/.s.PGSQL.5432",
+            "database": "db",
+            "username": "pguser"
+        }
+    ]
+}
