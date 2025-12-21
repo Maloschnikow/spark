@@ -1,5 +1,13 @@
-use axum::{Json, Router, extract::State, http::StatusCode, routing::{get, post}};
-use clorinde::{deadpool_postgres::Pool, queries::users::{get_all_users, insert_user}};
+use axum::{
+    Json, Router,
+    extract::State,
+    http::StatusCode,
+    routing::{get, post},
+};
+use clorinde::{
+    deadpool_postgres::Pool,
+    queries::users::{get_all_users, insert_user},
+};
 
 use crate::api_types::User;
 
@@ -29,10 +37,19 @@ async fn get_users(State(pool): State<Pool>) -> (StatusCode, Result<Json<Vec<Use
 
     let result = get_all_users().bind(&client).all().await;
     if result.is_err() {
-        return (StatusCode::INTERNAL_SERVER_ERROR, Err(result.unwrap_err().to_string()));
+        return (
+            StatusCode::INTERNAL_SERVER_ERROR,
+            Err(result.unwrap_err().to_string()),
+        );
     }
     let vec = result.unwrap();
-    let user_vec = vec.iter().map(|row| User {id: row.id, username: row.username.clone()}).collect();
+    let user_vec = vec
+        .iter()
+        .map(|row| User {
+            id: row.id,
+            username: row.username.clone(),
+        })
+        .collect();
 
     return (StatusCode::OK, Ok(Json(user_vec)));
 }
@@ -51,8 +68,10 @@ async fn get_users(State(pool): State<Pool>) -> (StatusCode, Result<Json<Vec<Use
     )
 )]
 #[axum::debug_handler]
-async fn post_user(State(pool): State<Pool>, username: String) -> (StatusCode, Result<Json<User>, String>) {
-
+async fn post_user(
+    State(pool): State<Pool>,
+    username: String,
+) -> (StatusCode, Result<Json<User>, String>) {
     let pool_result = pool.get().await;
     if let Err(e) = pool_result {
         return (StatusCode::INTERNAL_SERVER_ERROR, Err(e.to_string()));
@@ -62,11 +81,13 @@ async fn post_user(State(pool): State<Pool>, username: String) -> (StatusCode, R
     let result = insert_user().bind(&client, &username).one().await;
     match result {
         Ok(row) => {
-            let inserted_user = User { id: row.id, username: row.username };
+            let inserted_user = User {
+                id: row.id,
+                username: row.username,
+            };
             return (StatusCode::CREATED, Ok(Json(inserted_user)));
         }
         Err(e) => {
-
             if let Some(some_eb_error) = e.as_db_error() {
                 // Check for PostgreSQL unique violation error code
                 if some_eb_error.code().code() == "23505" {

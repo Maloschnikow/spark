@@ -1,7 +1,7 @@
 pub mod user_routes;
 
 use axum::Router;
-use clorinde::deadpool_postgres::{Pool};
+use clorinde::deadpool_postgres::Pool;
 use utoipa::OpenApi;
 use utoipa_swagger_ui::SwaggerUi;
 
