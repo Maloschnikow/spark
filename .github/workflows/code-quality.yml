@@ -50,7 +50,7 @@ jobs:
         run: |
           cd backend
           cargo fmt --check
-          cargo clippy -- --allow clippy::needless_return
+          cargo clippy -- -D warnings --allow clippy::needless_return
 
       - name: Export Nix store cache
         if: steps.nix-cache.outputs.cache-hit != 'true'
