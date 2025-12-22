@@ -1,0 +1,58 @@
+name: Code quality checks
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/formatting.yml"
+      - "backend/src/"
+  pull_request:
+    branches: [main]
+    paths:
+      - ".github/workflows/audit.yml"
+      - "backend/src/"
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}@${{ github.head_ref || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  formatting-check:
+    name: Check formatting and lint code
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+      
+      - name: Cache Nix store
+        uses: actions/cache@v5
+        id: nix-cache
+        with:
+          path: /tmp/nix-cache
+          key: ${{ runner.os }}-nix-cache-${{ hashFiles('flake.lock', 'flake.nix', 'nix/**') }}
+
+      - name: Install Nix
+        uses: cachix/install-nix-action@v31
+        with:
+          github_access_token: ${{ secrets.GITHUB_TOKEN }}
+      
+      # https://github.com/cachix/install-nix-action/issues/56#issuecomment-1240991760 (thanks)
+      - name: Import Nix store cache
+        if: steps.nix-cache.outputs.cache-hit == 'true'
+        run: "nix-store --import < /tmp/nix-cache"
+      
+      - name: Pre-build devShell
+        run: nix build --no-link .#devShells.$(nix eval --impure --raw --expr 'builtins.currentSystem').default
+            
+      - name: Perform checks
+        shell: nix develop -c bash -e {0}
+        run: |
+          cd backend
+          cargo fmt --check
+          cargo clippy -- --allow clippy::needless_return
+
+      - name: Export Nix store cache
+        if: steps.nix-cache.outputs.cache-hit != 'true'
+        run: "nix-store --export $(find /nix/store -maxdepth 1 -name '*-*') > /tmp/nix-cache"
+
