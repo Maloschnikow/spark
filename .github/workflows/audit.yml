@@ -1,0 +1,37 @@
+name: Audit backend
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/audit.yml"
+      - "**/Cargo.toml"
+      - "**/Cargo.lock"
+  pull_request:
+    branches: [main]
+    paths:
+      - ".github/workflows/audit.yml"
+      - "**/Cargo.toml"
+      - "**/Cargo.lock"
+  schedule:
+    - cron: "30 6 * * 1" # "At 06:30 on Monday."
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}@${{ github.head_ref || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  audit:
+    name: Audit backend (job)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+
+      - name: Audit Rust dependencies
+        uses: actions-rust-lang/audit@v1
+        with:
+          workingDirectory: backend
+          createIssues: false
+          TOKEN:
