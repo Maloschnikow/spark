@@ -58,8 +58,6 @@
 
             # Used by sqlx
             export DATABASE_URL="postgres:///$PGDATABASE?user=$CUSTOM_PGUSER&password=$PGPASSWORD&host=$PG_SOCKET_DIR"
-
-            alias act=$(act --action-cache-path $REPO_ROOT/.cache/act --cache-server-path $REPO_ROOT/.cache/actcache)
           '';
         };
       }

@@ -62,6 +62,10 @@
       echo "Migrate up everything..."
       sqlx migrate run --source "$REPO_ROOT/database/migrations"
     '')
+
+    (mkScript "acts" ''
+      act --rm --action-cache-path $REPO_ROOT/.cache/act --cache-server-path $REPO_ROOT/.cache/actcache
+    '')
   ];
 in
   shellScripts
