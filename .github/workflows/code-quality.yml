@@ -24,7 +24,13 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v6
-      
+
+      - name: Install Nix
+        id: nix-install
+        uses: cachix/install-nix-action@v31
+        with:
+          github_access_token: ${{ secrets.GITHUB_TOKEN }}
+
       - name: Cache Nix store
         uses: actions/cache@v5
         id: nix-cache
@@ -32,19 +38,14 @@ jobs:
           path: /tmp/nix-cache
           key: ${{ runner.os }}-nix-cache-${{ hashFiles('flake.lock', 'flake.nix', 'nix/**') }}
 
-      - name: Install Nix
-        uses: cachix/install-nix-action@v31
-        with:
-          github_access_token: ${{ secrets.GITHUB_TOKEN }}
-      
       # https://github.com/cachix/install-nix-action/issues/56#issuecomment-1240991760 (thanks)
       - name: Import Nix store cache
         if: steps.nix-cache.outputs.cache-hit == 'true'
         run: "nix-store --import < /tmp/nix-cache"
-      
+
       - name: Pre-build devShell
         run: nix build --no-link .#devShells.$(nix eval --impure --raw --expr 'builtins.currentSystem').default
-            
+
       - name: Perform checks
         shell: nix develop -c bash -e {0}
         run: |
@@ -54,5 +55,8 @@ jobs:
 
       - name: Export Nix store cache
         if: steps.nix-cache.outputs.cache-hit != 'true'
-        run: "nix-store --export $(find /nix/store -maxdepth 1 -name '*-*') > /tmp/nix-cache"
+        run: |
+          # Get Nix store paths of the flake's runtime closure (dependencies required to run the devShell)
+          STORE_PATHS=$(nix path-info -r $(nix build --no-link --print-out-paths .#devShells.$(nix eval --impure --raw --expr 'builtins.currentSystem').default))
+          nix-store --export $STORE_PATHS > /tmp/nix-cache
 

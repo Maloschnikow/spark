@@ -1,5 +1,6 @@
 /.direnv
 /postgres
+/.cache
 
 #backend
 /backend/target

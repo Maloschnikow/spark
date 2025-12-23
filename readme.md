@@ -57,7 +57,7 @@ You need to [generate new rust types after migrating](#migrations) the database.
 > Use `database/dev_init.sql` to fill the database with example data.
 
 ### Workflows (CI/CD)
-The nix environment includes [act](https://github.com/nektos/act) to
+The Nix environment includes [act](https://github.com/nektos/act) to
 run GitHub Actions locally. This enables us to test workflows locally
 and check if they work before committing them.
 
@@ -66,8 +66,10 @@ act requires docker to run.
 When you run `act` for the first time, you get asked on what image you want to use.
 I recommend using the `full` sized image, they are quite large, but are essentially
 equal to GitHub runners. More about the runners can be found [here](https://nektosact.com/usage/runners.html).
-
 A usage guide can be found [here](https://nektosact.com/usage/index.html).
+
+The Nix environment aliases `act` with `act --action-cache-path $REPO_ROOT/.cache/act --cache-server-path $REPO_ROOT/.cache/actcache`.
+So after running `act` you can find the caches within `.cache`.
 
 ### Folder structure
 Here's a quick overview over what you can find where in this repository.
