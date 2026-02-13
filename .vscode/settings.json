@@ -1,9 +1,5 @@
 {
     "rust-analyzer.rustc.source": "backend",
-    "files.exclude": {
-        ".direnv": true,
-        "backend/target": true
-    },
     "sqltools.connections": [
         {
             "ssh": "Disabled",

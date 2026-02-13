@@ -31,6 +31,7 @@
         devShells.default = pkgs.mkShell {
           packages = with pkgs;
             [
+              # for backend
               rust-bin.stable.latest.default
               cargo-audit
               cargo-edit
@@ -38,6 +39,9 @@
               postgresql_18
               sqlx-cli # For migrations
               clorinde
+
+              # for frontend
+              nodePackages.nodejs
 
               act # To run github workflows locally
             ]
