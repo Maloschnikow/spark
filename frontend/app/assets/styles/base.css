@@ -1,0 +1,48 @@
+:root {
+    font-family: "Plus Jakarta Sans", sans-serif;
+    font-style: normal;
+    font-weight: 400;
+    font-size: medium;
+
+    --color-black0: #0c0c12;
+    --color-black1: #171720;
+
+    --color-gray0: #4c5b5c;
+    --color-gray1: #bfd1e5;
+    
+    --color-white0: #eeeeee;
+    --color-white1: #000000;
+    
+    --color-red0: #87091E;
+    --color-red1: #990033;
+    --color-red2: #CB2641;
+    --color-red3: #ff0e36;
+    --color-red4: #ff715b;
+
+    --color-orange0: #ba3f1d;
+    --color-orange1: #ff6f00;
+    --color-orange2: #ff9000;
+
+    --color-yellow0: #E3C61F;
+    --color-yellow1: #FFDD00;
+    --color-yellow2: #fffb46;
+
+    --color-green0: #3E7931;
+    --color-green1: #55ac42;
+    --color-green2: #4DEA4D;
+
+    --color-blue0: #004ba8;
+    --color-blue1: #15c4ec;
+    --color-blue2: #78e3fd;
+    
+    --main-fg-color: var(--color-white0);
+    --main-bg-color: var(--color-black1);
+    --second-bg-color: var(--color-black0);
+    
+    background-color: var(--main-bg-color);
+    color: var(--main-fg-color);
+}
+body {
+    margin: 0;
+    padding: 0;
+}

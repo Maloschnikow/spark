@@ -1,0 +1,52 @@
+@import './base.css';
+
+a {
+    color: var(--color-blue2);
+    text-decoration: none;
+}
+
+a:hover {
+    color: var(--color-blue1);
+    text-decoration: underline;
+}
+
+input {
+    border-radius: 0.2rem;
+    border-style: solid;
+    border-color: var(--main-fg-color);
+    outline: none;
+
+    background-color: var(--main-fg-color);
+}
+
+input:focus {
+    border-color: var(--color-blue1);
+}
+
+form.wrapped {
+    background-color: var(--second-bg-color);
+
+    display: flex;
+    flex-direction: column;
+
+    justify-content: center;
+    align-items: center;
+
+    border-color: var(--color-blue1);
+    border-width: 0.15rem;
+    border-style: solid;
+    border-radius: 0.5rem;
+
+
+    width: fit-content;
+    padding: 0.5rem;
+}
+
+select {
+    color: var(--main-fg-color);
+    background-color: var(--second-bg-color);
+
+    border-color: var(--color-yellow);
+    border-style: solid;
+    border-radius: 0.5rem;
+}
