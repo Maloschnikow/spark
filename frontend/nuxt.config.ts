@@ -7,7 +7,7 @@ export default defineNuxtConfig({
     config: {
       stylistic: {
         semi: true,
-      }
-    }
-  }
+      },
+    },
+  },
 })

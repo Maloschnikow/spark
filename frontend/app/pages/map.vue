@@ -1,102 +1,117 @@
 <script setup lang="ts">
-import { ref, onMounted, type Ref, onUnmounted, h, render } from 'vue';
-import { Popup, Map, Marker, LngLat, MapMouseEvent, type SourceSpecification, type Source } from 'maplibre-gl';
-import 'maplibre-gl/dist/maplibre-gl.css';
-import { Urgency } from '~/components/types/Urgency';
-import MapMarkerPopup from '~/components/map/MapMarkerPopup.vue';
+import { ref, onMounted, type Ref, onUnmounted, h, render } from 'vue'
+import type { MapMouseEvent, Popup, Map, Marker, LngLat, type SourceSpecification, type Source } from 'maplibre-gl'
+import 'maplibre-gl/dist/maplibre-gl.css'
+import { Urgency } from '~/components/types/Urgency'
+import MapMarkerPopup from '~/components/map/MapMarkerPopup.vue'
 
 interface MapStyle {
-    name: string
-    url: string
+  name: string
+  url: string
 }
 
 const availableMapStyles: MapStyle[] = [
-    // World
-    {name: "World Color", url:"https://sgx.geodatenzentrum.de/gdz_basemapworld_vektor/styles/bm_web_wld_col.json"},
-    // Germany Only (https://basemap.de/produkte-und-dienste/web-vektor/)
-    {name: "Germany Color, no terrain", url: "https://sgx.geodatenzentrum.de/gdz_basemapde_vektor/styles/bm_web_col.json"}, // Farbe ohne Gelände
-    {name: "Germany Color, with terrain", url:"https://sgx.geodatenzentrum.de/gdz_basemapde_vektor/styles/bm_web_top.json"}, // Farbe mit Gelände
-    {name: "Germany Grayscale", url:"https://sgx.geodatenzentrum.de/gdz_basemapde_vektor/styles/bm_web_gry.json"}, // Grau
+  // World
+  { name: 'World Color', url: 'https://sgx.geodatenzentrum.de/gdz_basemapworld_vektor/styles/bm_web_wld_col.json' },
+  // Germany Only (https://basemap.de/produkte-und-dienste/web-vektor/)
+  { name: 'Germany Color, no terrain', url: 'https://sgx.geodatenzentrum.de/gdz_basemapde_vektor/styles/bm_web_col.json' }, // Farbe ohne Gelände
+  { name: 'Germany Color, with terrain', url: 'https://sgx.geodatenzentrum.de/gdz_basemapde_vektor/styles/bm_web_top.json' }, // Farbe mit Gelände
+  { name: 'Germany Grayscale', url: 'https://sgx.geodatenzentrum.de/gdz_basemapde_vektor/styles/bm_web_gry.json' }, // Grau
 ]
 
 const selectedMapSytle: Ref<MapStyle | undefined> = ref(availableMapStyles[0])
-const mapContainer: Ref<HTMLElement | null> = ref(null);
-const map: Ref<Map | null> = ref(null);
+const mapContainer: Ref<HTMLElement | null> = ref(null)
+const map: Ref<Map | null> = ref(null)
 
 const createMarker = (lng: number, lat: number) => {
-    if (!map.value) return;
+  if (!map.value) return
 
-    const popupContent = document.createElement('div');
-    const popup = new Popup({closeOnClick: false})
+  const popupContent = document.createElement('div')
+  const popup = new Popup({ closeOnClick: false })
     .setDOMContent(popupContent)
-    .setLngLat(LngLat.convert([lng, lat]));
-
-    const marker = new Marker()
     .setLngLat(LngLat.convert([lng, lat]))
-    .setPopup(popup);
 
-    const component = h(MapMarkerPopup, {
-        onDelete: () => {
-            marker.remove();
-        },
-    })
-    render(component, popupContent);
+  const marker = new Marker()
+    .setLngLat(LngLat.convert([lng, lat]))
+    .setPopup(popup)
 
-    marker.getElement().addEventListener('click', (e) => {
-        e.stopPropagation();
-        popup.addTo(map.value!);
-    });
+  const component = h(MapMarkerPopup, {
+    onDelete: () => {
+      marker.remove()
+    },
+  })
+  render(component, popupContent)
 
-    marker.addTo(map.value);
+  marker.getElement().addEventListener('click', (e) => {
+    e.stopPropagation()
+    popup.addTo(map.value!)
+  })
+
+  marker.addTo(map.value)
 }
 
 onMounted(() => {
-    map.value = new Map({
-        container: mapContainer.value!,
-        style: selectedMapSytle.value?.url,
-        center: [10.4, 51.3], // [lng, lat] not lat, lng!
-        zoom: 6,
-    });
+  map.value = new Map({
+    container: mapContainer.value!,
+    style: selectedMapSytle.value?.url,
+    center: [10.4, 51.3], // [lng, lat] not lat, lng!
+    zoom: 6,
+  })
 
-    map.value.on('click', (e: MapMouseEvent) => {
-        const {lng, lat} = e.lngLat;
-        createMarker(lng, lat);
-    });
+  map.value.on('click', (e: MapMouseEvent) => {
+    const { lng, lat } = e.lngLat
+    createMarker(lng, lat)
+  })
 
-    map.value.on('mousemove', () => {
-        map.value!.getCanvas().style.cursor = 'default';
-    });
-
-
-});
+  map.value.on('mousemove', () => {
+    map.value!.getCanvas().style.cursor = 'default'
+  })
+})
 
 onUnmounted(() => {
-    map.value?.remove();
-});
+  map.value?.remove()
+})
 
 watch(selectedMapSytle,
-    (newMapStyle) => {
-        if (!newMapStyle) return;
-        map.value?.setStyle(newMapStyle.url)
-    }
+  (newMapStyle) => {
+    if (!newMapStyle) return
+    map.value?.setStyle(newMapStyle.url)
+  },
 )
 </script>
 
 <template>
+  <div class="gridContainer">
+    <div class="mapStyleSelectorWrapper">
+      Available Map Styles:
 
-    <div class="gridContainer">
-        <div class="mapStyleSelectorWrapper">
-            Available Map Styles:
-            
-            <div style="display: inline; width:max-content;" v-for="style in availableMapStyles">
-                <DefaultButton class="mapStyleButton" v-if="style.url != selectedMapSytle?.url" @click="selectedMapSytle = style">{{style.name}}</DefaultButton>
-                <DefaultButton class="mapStyleButton" v-else :urgency="Urgency.Okay" :disabled=true>{{ style.name }}</DefaultButton>
-            </div>
-
-        </div>
-        <div ref="mapContainer" class="map-container" />
-        <div>Space for more options and settings</div>
+      <div
+        v-for="style in availableMapStyles"
+        style="display: inline; width:max-content;"
+      >
+        <DefaultButton
+          v-if="style.url != selectedMapSytle?.url"
+          class="mapStyleButton"
+          @click="selectedMapSytle = style"
+        >
+          {{ style.name }}
+        </DefaultButton>
+        <DefaultButton
+          v-else
+          class="mapStyleButton"
+          :urgency="Urgency.Okay"
+          :disabled="true"
+        >
+          {{ style.name }}
+        </DefaultButton>
+      </div>
     </div>
+    <div
+      ref="mapContainer"
+      class="map-container"
+    />
+    <div>Space for more options and settings</div>
+  </div>
 </template>
 
 <style scoped>
