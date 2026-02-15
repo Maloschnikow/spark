@@ -103,7 +103,8 @@ jobs:
         context:
           # cargo command, requires database
           [
-            ["lint"]
+            ["lint"],
+            ["build"]
           ]
     steps:
       - uses: actions/checkout@v6
