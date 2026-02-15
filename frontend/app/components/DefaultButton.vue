@@ -1,35 +1,44 @@
 <script setup lang="ts">
-    enum Urgency {
-        Okay = "okay",
-        Normal = "normal",
-        Warning = "warning",
-        Danger = "danger"
-    }
+enum Urgency {
+  Okay = 'okay',
+  Normal = 'normal',
+  Warning = 'warning',
+  Danger = 'danger',
+}
 
-    interface Props {
-        urgency?: Urgency
-        disabled?: boolean
-    }
+interface Props {
+  urgency?: Urgency;
+  disabled?: boolean;
+}
 
-    const props = withDefaults(defineProps<Props>(), {
-        urgency: Urgency.Normal,
-        disabled: false
-    });
-
+const props = withDefaults(defineProps<Props>(), {
+  urgency: Urgency.Normal,
+  disabled: false,
+});
 </script>
 
 <template>
-    <button v-if="!disabled" :class="props.urgency"><slot /></button>
-    <button v-else disabled="true" :class="props.urgency"><slot /></button>
+  <button
+    v-if="!disabled"
+    :class="props.urgency"
+  >
+    <slot />
+  </button>
+  <button
+    v-else
+    disabled="true"
+    :class="props.urgency"
+  >
+    <slot />
+  </button>
 </template>
 
 <style scoped>
-
 button {
     color: var(--main-fg-color);
     background-color: var(--main-bg-color);
     border-color: var(--main-fg-color);
-    
+
     border-style: solid;
     border-radius: 0.2rem;
 

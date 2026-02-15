@@ -1,15 +1,21 @@
 <script setup lang="ts">
 import { Urgency } from '../types/Urgency';
 
-const emit = defineEmits(['delete'])
+const emit = defineEmits(['delete']);
 
 const handleDelete = () => {
-    emit('delete')
-}
+  emit('delete');
+};
 </script>
 
 <template>
-    <div>
-        <DefaultButton :urgency=Urgency.Danger @click="handleDelete" class="delete-btn">Delete</DefaultButton>
-    </div>
+  <div>
+    <DefaultButton
+      :urgency="Urgency.Danger"
+      class="delete-btn"
+      @click="handleDelete"
+    >
+      Delete
+    </DefaultButton>
+  </div>
 </template>

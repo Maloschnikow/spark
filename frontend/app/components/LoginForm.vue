@@ -1,26 +1,50 @@
 <script setup lang="ts">
 interface Props {
-    error?: string
+  error?: string;
 }
 const props = defineProps<Props>();
 </script>
+
 <template>
-    <form class="wrapped loginWrapper" method="post">
-        <div class="inputWrapper">
-            <input class="usernameInput inputField" id="username" name="username" type="text" placeholder="Username" required/> 
-            <input class="passwordInput inputField" id="password" name="password" type="password" placeholder="Password" required/>
-        </div>
-        <div class="buttonAndOutputWrapper">
-            <DefaultButton class="submitButton" type="submit">Login</DefaultButton>
+  <form
+    class="wrapped loginWrapper"
+    method="post"
+  >
+    <div class="inputWrapper">
+      <input
+        id="username"
+        class="usernameInput inputField"
+        name="username"
+        type="text"
+        placeholder="Username"
+        required
+      >
+      <input
+        id="password"
+        class="passwordInput inputField"
+        name="password"
+        type="password"
+        placeholder="Password"
+        required
+      >
+    </div>
+    <div class="buttonAndOutputWrapper">
+      <DefaultButton
+        class="submitButton"
+        type="submit"
+      >
+        Login
+      </DefaultButton>
 
-            <span v-if="props.error !== undefined" class="error">{{props.error}}</span>
-
-        </div>
-    </form>
+      <span
+        v-if="props.error !== undefined"
+        class="error"
+      >{{ props.error }}</span>
+    </div>
+  </form>
 </template>
 
 <style scoped>
-
 .submitButton {
     color: var(--color-blue1);
     border-color: var(--color-blue1);
