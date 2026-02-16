@@ -1,25 +1,18 @@
-name: Audit backend
-
+name: Audit
 on:
-  push:
-    branches: [main]
-  pull_request:
-    branches: [main]
   schedule:
     - cron: "30 6 * * 1" # "At 06:30 on Monday."
-  workflow_dispatch:
+  workflow_call:
 
 concurrency:
   group: ${{ github.workflow }}@${{ github.head_ref || github.ref }}
   cancel-in-progress: true
 
 jobs:
-  audit:
-    name: Audit backend (job)
+  backend-audit:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v6
+      - uses: actions/checkout@v6
 
       - name: Audit Rust dependencies
         uses: actions-rust-lang/audit@v1
@@ -27,3 +20,9 @@ jobs:
           workingDirectory: backend
           createIssues: false
           TOKEN:
+
+  frontend-audit:
+    uses: ./.github/workflows/run-in-nix-env.yml
+    with:
+      commands: npm audit
+      working-directory: frontend/
