@@ -27,15 +27,18 @@ jobs:
   # Else the nix cache might try to build two times simutaniously.
     
   build-cache-nix:
-    uses: ./.github/workflows/nix-cache.yml
+    runs-on: ubuntu-latest
+    steps: 
+      - uses: actions/checkout@v6
+      - uses: ./.github/actions/nix-cache
 
   audit:
-    uses: ./.github/workflows/audit.yml
     needs: build-cache-nix
+    uses: ./.github/workflows/audit.yml
 
   backend-checks:
-    uses: ./.github/workflows/run-in-nix-env.yml
     needs: build-cache-nix
+    runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
@@ -46,16 +49,19 @@ jobs:
             ["clippy -- -D warnings --allow clippy::needless_return", false],
             ["test", true, 'backend/'],
           ]
-    with:
-      commands: |
-        # $\{{ case(matrix.context[1] == true, 'db-start') }} # doesnt work yet (at least with act)
-        db-start
-        cargo ${{ matrix.context[0] }}
-      working-directory: backend/
+    steps:
+      - uses: actions/checkout@v6
+      - uses: ./.github/actions/run-in-nix-env
+        with:
+          commands: |
+            # $\{{ case(matrix.context[1] == true, 'db-start') }} # doesnt work yet (at least with act)
+            db-start
+            cargo ${{ matrix.context[0] }}
+          working-directory: backend/
 
   frontend-checks:
-    uses: ./.github/workflows/run-in-nix-env.yml
     needs: build-cache-nix
+    runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
@@ -65,8 +71,11 @@ jobs:
             ["typecheck"],
             ["build"]
           ]
-    with:
-      commands: |
-        npm ci
-        npm run ${{ matrix.context[0] }}
-      working-directory: frontend/
+    steps:
+      - uses: actions/checkout@v6
+      - uses: ./.github/actions/run-in-nix-env
+        with:
+          commands: |
+            npm ci
+            npm run ${{ matrix.context[0] }}
+          working-directory: frontend/

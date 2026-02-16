@@ -1,0 +1,47 @@
+name: Run commands in nix env
+description: |
+  Pulls the nix cache and runs commands within the nix environment.
+
+
+inputs:
+  commands:
+    required: false
+    type: string
+
+  working-directory:
+    required: true
+    type: string
+    default: '/'
+
+runs:
+  using: composite
+  steps:
+    #- uses: actions/checkout@v6
+    - uses: cachix/install-nix-action@v31
+
+    - name: Cache Nix
+      uses: actions/cache@v5
+      id: nix-cache
+      with:
+        path: /tmp/nix-cache
+        key: ${{ runner.os }}-nix-cache-${{ hashFiles('flake.lock', 'flake.nix', 'nix/**') }}
+
+    - run: |
+        echo No Cache found, but one should have been saved
+        exit 1
+      if: steps.nix-cache.outputs.cache-hit != 'true'
+      shell: bash
+    
+    # https://github.com/cachix/install-nix-action/issues/56#issuecomment-1240991760 (thanks)
+    - name: Import Nix store cache
+      run: "nix-store --import < /tmp/nix-cache"
+      shell: bash
+
+    - name: Pre-build devShell # In theory the Nix cache should have a hit and therefore the devShell should already be built in the cache
+      run: nix build --no-link .#devShells.$(nix eval --impure --raw --expr 'builtins.currentSystem').default
+      shell: bash
+
+    - shell: nix develop ./ -c bash -e {0}
+      run: |
+        cd ${{ inputs.working-directory }}
+        ${{inputs.commands}}

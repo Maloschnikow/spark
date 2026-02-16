@@ -4,16 +4,11 @@ on:
     - cron: "30 6 * * 1" # "At 06:30 on Monday."
   workflow_call:
 
-concurrency:
-  group: ${{ github.workflow }}@${{ github.head_ref || github.ref }}
-  cancel-in-progress: true
-
 jobs:
   backend-audit:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
-
       - name: Audit Rust dependencies
         uses: actions-rust-lang/audit@v1
         with:
@@ -22,7 +17,11 @@ jobs:
           TOKEN:
 
   frontend-audit:
-    uses: ./.github/workflows/run-in-nix-env.yml
-    with:
-      commands: npm audit
-      working-directory: frontend/
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: ./.github/actions/run-in-nix-env
+        with:
+          commands: |
+            npm audit --audit-level low
+          working-directory: frontend/
