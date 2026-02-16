@@ -42,7 +42,7 @@ jobs:
           # Get Nix store paths of the flake's runtime closure (dependencies required to run the devShell)
           STORE_PATHS=$(nix path-info -r $(nix build --no-link --print-out-paths .#devShells.$(nix eval --impure --raw --expr 'builtins.currentSystem').default))
           nix-store --export $STORE_PATHS > /tmp/nix-cache
-          shell: bash
+        shell: bash
 
       - uses: actions/cache/save@v5
         id: nix-cache
